@@ -23,9 +23,17 @@ app.get('/', (req, res) => {
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 client.connect(err => {
   const destinationsCollection = client.db("flyAway").collection("destinations");
+  const bookingsCollection = client.db("flyAway").collection("bookings");
 
   app.get('/destinations', (req, res) => {
     destinationsCollection.find({})
+      .toArray((err, documents) => {
+        res.send(documents);
+      })
+  })
+
+  app.get('/bookings', (req, res) => {
+    bookingsCollection.find({})
       .toArray((err, documents) => {
         res.send(documents);
       })
@@ -38,6 +46,14 @@ client.connect(err => {
       })
   })
 
+  app.post('/addBooking', (req, res) => {
+    const newBooking = req.body;
+    bookingsCollection.insertOne(newBooking)
+      .then(result => {
+        res.send(result.insertedCount > 0);
+      })
+  })
+
   app.post('/addDestinations', (req, res) => {
     const service = req.body;
     destinationsCollection.insertOne(service)
@@ -45,6 +61,14 @@ client.connect(err => {
         res.send(result.insertedCount > 0)
       })
   })
+
+  app.delete('/deleteBooking/:id', (req, res) => {
+    bookingsCollection.deleteOne({ _id: ObjectId(req.params.id) })
+      .then(result => {
+        res.send(result.deletedCount > 0);
+      })
+  })
+
 });
 
 
