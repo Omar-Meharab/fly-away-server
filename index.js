@@ -55,8 +55,8 @@ client.connect(err => {
   })
 
   app.post('/addDestinations', (req, res) => {
-    const service = req.body;
-    destinationsCollection.insertOne(service)
+    const destination = req.body;
+    destinationsCollection.insertOne(destination)
       .then(result => {
         res.send(result.insertedCount > 0)
       })
